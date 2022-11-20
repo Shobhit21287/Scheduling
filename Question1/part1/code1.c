@@ -64,6 +64,8 @@ void *countC(){
 
 void main(){
 	pthread_t ThrA,ThrB,ThrC;
+	
+	struct sched_param forA,forB,forC;
 
 	forA.sched_priority = 0;
 	forB.sched_priority = 99;
@@ -84,6 +86,10 @@ void main(){
 	pthread_attr_setschedparam(&attr1,&forA);
 	pthread_attr_setschedparam(&attr2,&forB);
 	pthread_attr_setschedparam(&attr3,&forC);
+
+	/*pthread_setschedparam(ThrA,1,&forA);
+	pthread_setschedparam(ThrB,2,&forB);
+	pthread_setschedparam(ThrC,4,&forC);*/
 
 	pthread_create(&ThrA,&attr1,countA,NULL);
 	pthread_create(&ThrB,&attr2,countB,NULL);

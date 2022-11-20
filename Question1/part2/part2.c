@@ -5,42 +5,49 @@
 #include <time.h>
 #include <sys/wait.h>
 
-int main(){
-	char *arr[] = {"bash.sh",NULL};
-	
-	pid_t first,second;
-	clock_t start,end;
-	double final;
-	
-	int array[3];
-	
-	start = clock();
+clock_t start;
+clock_t ends[3];
 
-	first = fork();
-	second = fork();
+char * arr[] = {"./bash.sh",NULL};
 
-	if(first > 0 && second == 0){
-		execv("./bash.sh",arr);
-		printf("bruh\n");
+pid_t forking(){
+	pid_t new;
+	new = fork();
+	if(new > 1){
+		return new;
 	}
-	else if(first == 0 && second > 0){
+	else if(new == 0){
 		execv("./bash.sh",arr);
-		printf("bruh2\n");
-	}
-	else if(first == 0 && second == 0){
-		execv("./bash.sh",arr);
-		printf("bruh3\n");
+		exit(0);
 	}
 	else{
-		waitpid(first,&array[0],0);
-		end = clock();
-		final = (double)(end - start) / CLOCKS_PER_SEC;
-		waitpid(second,&array[1],0);
-		end = clock();
-		final = (double)(end - start) / CLOCKS_PER_SEC;
-		waitpid(second + 1,&array[2],0);
-		end = clock();
-		final = (double)(end - start) / CLOCKS_PER_SEC;
+		printf("error in forking\n");
 	}
-	return 0;
+}
+
+int main(){
+	pid_t arr[3];
+	pid_t arr2[3];
+	int status[3];
+
+	for(int i = 0 ; i < 3 ; i++){
+		arr[i] = forking();
+	}
+
+	for(int i = 0 ; i < 3 ; i++){
+		arr2[i] = waitpid(-1,&status[i],0);
+		ends[i] = clock();
+	}
+
+	double final;
+
+	for(int i = 0 ; i < 3 ; i++){
+		for(int j = 0 ; j < 3 ; j++){
+			if(arr2[j] == arr[i]){
+				printf("time taken by process %d :",j + 1);
+			}
+		}
+		final = (double)(ends[i] - start) / CLOCKS_PER_SEC ;
+		printf("%f\n",final);
+	}
 }
