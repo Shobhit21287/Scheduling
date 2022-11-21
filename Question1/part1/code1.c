@@ -10,8 +10,8 @@ struct sched_param forA,forB,forC;
 
 void *countA(){
 	pthread_attr_setschedparam(&attr1,&forA);
-	clock_t s,t;
-	s = clock();
+	struct timespec start,end;
+	clock_gettime(CLOCK_REALTIME,&start);
 	long int i = 1;
 	for(long int j = 1 ; j < pow(2,32) ; j++){
 		i++;
@@ -20,16 +20,16 @@ void *countA(){
 	for(long int j = 1 ; j < pow(2,32) ; j++){
 		i++;
 	}
-	t = clock();
-	double final = (double)(t - s) / CLOCKS_PER_SEC;
-	printf("thread A : %f\n",final);
+	clock_gettime(CLOCK_REALTIME,&end);
+	double final =(double)((end.tv_sec - start.tv_sec)*1000000000 + (end.tv_nsec - start.tv_nsec))/1000000000;
+	printf("thread OTHER : %f\n",final);
 	return NULL;
 }
 
 void *countB(){
 	pthread_attr_setschedparam(&attr2,&forB);
-	clock_t s,t;
-	s = clock();
+	struct timespec start,end;
+	clock_gettime(CLOCK_REALTIME,&start);
 	long int i = 1;
 	for(long int j = 1 ; j < pow(2,32) ; j++){
 		i++;
@@ -38,16 +38,16 @@ void *countB(){
 	for(long int j = 1 ; j < pow(2,32) ; j++){
 		i++;
 	}
-	t = clock();
-	double final = (double)(t-s) / CLOCKS_PER_SEC;
-	printf("Thread B : %f\n",final);
+	clock_gettime(CLOCK_REALTIME,&end);
+	double final =(double) ((end.tv_sec - start.tv_sec)*1000000000 + (end.tv_nsec - start.tv_nsec))/1000000000;
+	printf("Thread RR : %f\n",final);
 	return NULL;
 }
 
 void *countC(){
 	pthread_attr_setschedparam(&attr3,&forC);
-	clock_t s,t;
-	s = clock();
+	struct timespec start,end ;
+	clock_gettime(CLOCK_REALTIME,&start);
 	long int i = 1;
 	for(long int j = 1 ; j < pow(2,32) ; j++){
 		i++;
@@ -56,9 +56,9 @@ void *countC(){
 	for(long int j = 0 ; j < pow(2,32) ; j++){
 		i++;
 	}
-	t = clock();
-	double final = (double)(t - s)/CLOCKS_PER_SEC;
-	printf("Thread C : %f\n",final);
+	clock_gettime(CLOCK_REALTIME,&end);
+	double final =(double)((end.tv_sec - start.tv_sec)*1000000000 + (end.tv_nsec - start.tv_nsec))/1000000000 ;
+	printf("Thread FIFO : %f\n",final);
 	return NULL;
 }
 
