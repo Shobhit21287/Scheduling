@@ -1,0 +1,48 @@
+--- temp/bruh/arch/x86/entry/syscalls/syscall_64.tbl	2022-09-15 14:17:20.000000000 +0530
++++ linux-5.19.9/arch/x86/entry/syscalls/syscall_64.tbl	2022-11-20 00:33:50.240185732 +0530
+@@ -417,3 +417,4 @@
+ 547	x32	pwritev2		compat_sys_pwritev64v2
+ # This is the end of the legacy x32 range.  Numbers 548 and above are
+ # not special and are not to be used for x32-specific syscalls.
++548	common	twodcopy		sys_twodcopy
+--- temp/bruh/kernel/sys.c	2022-09-15 14:17:20.000000000 +0530
++++ linux-5.19.9/kernel/sys.c	2022-11-21 10:21:02.430778512 +0530
+@@ -167,6 +167,27 @@
+  *
+  * Called with rcu_read_lock, creds are safe
+  */
++
++SYSCALL_DEFINE3(twodcopy, double**, src, double** , dest, int, cells){
++
++	double * buff[1];
++	double ** temp = dest;
++
++	for(int i = 0 ; i < cells ; i++){
++		if(__copy_from_user(buff,src,sizeof(double*))){
++			return -EFAULT;
++		}
++		if(__copy_to_user(temp,buff,sizeof(double*))){
++			return -EFAULT;
++		}
++		src++;
++		temp++;
++	}
++
++	return 0;
++}
++
++
+ static bool set_one_prio_perm(struct task_struct *p)
+ {
+ 	const struct cred *cred = current_cred(), *pcred = __task_cred(p);
+@@ -599,6 +620,10 @@
+  * will allow a root program to temporarily drop privileges and be able to
+  * regain them by swapping the real and effective uid.
+  */
++
++
++
++
+ long __sys_setuid(uid_t uid)
+ {
+ 	struct user_namespace *ns = current_user_ns();
