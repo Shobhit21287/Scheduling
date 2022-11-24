@@ -70,40 +70,18 @@ void main(){
 	forA.sched_priority = 0;
 	forB.sched_priority = 99;
 	forC.sched_priority = 99;
-
-	pthread_attr_init(&attr1);
-	pthread_attr_init(&attr2);
-	pthread_attr_init(&attr3);
-
-	pthread_attr_setinheritsched(&attr1,PTHREAD_EXPLICIT_SCHED);
-	pthread_attr_setinheritsched(&attr2,PTHREAD_EXPLICIT_SCHED);
-	pthread_attr_setinheritsched(&attr3,PTHREAD_EXPLICIT_SCHED);
 	
-	pthread_attr_setschedpolicy(&attr1,SCHED_OTHER);
-	pthread_attr_setschedpolicy(&attr2,SCHED_RR);
-	pthread_attr_setschedpolicy(&attr3,SCHED_FIFO);
-
-	pthread_attr_setschedparam(&attr1,&forA);
-	pthread_attr_setschedparam(&attr2,&forB);
-	pthread_attr_setschedparam(&attr3,&forC);
-
-	/*pthread_setschedparam(ThrA,1,&forA);
-	pthread_setschedparam(ThrB,2,&forB);
-	pthread_setschedparam(ThrC,4,&forC);*/
-
-	pthread_create(&ThrA,&attr1,countA,NULL);
-	pthread_create(&ThrB,&attr2,countB,NULL);
-	pthread_create(&ThrC,&attr3,countC,NULL);
+	pthread_create(&ThrA,NULL,countA,NULL);
+	pthread_setschedparam(ThrA,SCHED_OTHER,&forA);
+	pthread_create(&ThrB,NULL,countB,NULL);
+	pthread_setschedparam(ThrB,SCHED_RR,&forB);
+	pthread_create(&ThrC,NULL,countC,NULL);
+	pthread_setschedparam(ThrC,SCHED_FIFO,&forC);
 
 	pthread_join(ThrA,NULL);
-	pthread_attr_destroy(&attr1);
 	pthread_join(ThrB,NULL);
-	pthread_attr_destroy(&attr2);
 	pthread_join(ThrC,NULL);
-	pthread_attr_destroy(&attr3);
 	
 	return;
 
 }
-
-
